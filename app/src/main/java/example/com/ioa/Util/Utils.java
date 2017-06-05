@@ -261,6 +261,7 @@ public class Utils {
         captureData.setMobileNumber(Utils.getDataFromSharedPref(context,Utils.PHONE_NUMBER));
         captureData.setImei(getIMEI(context));
 
+
         Gson gson1=new Gson();
         String cData=gson1.toJson(captureData, CaptureData.class);
         Iodata.setJsonData(cData);
