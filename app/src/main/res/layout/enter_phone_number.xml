@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="example.com.ioa.Enter_Phone_Number">
+    <EditText
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter Phone Number"
+        android:id="@+id/et_phone_number"
+        android:layout_marginTop="150dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_next"
+        android:text="SUBMIT"
+        android:enabled="false"
+        android:layout_below="@id/et_phone_number"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:layout_marginTop="15dp"
+        android:background="@color/colorAccent"/>
+
+    <EditText
+        android:id="@+id/et_std_code"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="+91"
+        android:layout_alignBaseline="@+id/et_phone_number"
+        android:layout_alignBottom="@+id/et_phone_number"
+        android:layout_toStartOf="@+id/et_phone_number"
+        android:layout_marginEnd="11dp" />
+</RelativeLayout>
