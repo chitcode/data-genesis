@@ -24,8 +24,17 @@ public class CaptureData {
     String imei;
     String cqi,ta,asulevel,level;
     String wifijson;
+    String sending_timestamp;
    // String
 
+
+    public String getSending_timestamp() {
+        return sending_timestamp;
+    }
+
+    public void setSending_timestamp(String sending_timestamp) {
+        this.sending_timestamp = sending_timestamp;
+    }
 
     public String getWifijson() {
         return wifijson;

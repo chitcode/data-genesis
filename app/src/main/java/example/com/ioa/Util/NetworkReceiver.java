@@ -22,12 +22,12 @@ public class NetworkReceiver extends BroadcastReceiver {
                     && NetworkInfo.State.CONNECTED != wifiState
                     && NetworkInfo.State.CONNECTED == mobileState) {
                 // phone network connect success
-
+                if(Utils.isNetworkConnected(context))
+                    Utils.sendDataToserver(context);
             } else if (wifiState != null && mobileState != null
                     && NetworkInfo.State.CONNECTED != wifiState
                     && NetworkInfo.State.CONNECTED != mobileState) {
                 // no network
-
             } else if (wifiState != null && NetworkInfo.State.CONNECTED == wifiState) {
                 // wift connect success
                 if(Utils.isNetworkConnected(context))

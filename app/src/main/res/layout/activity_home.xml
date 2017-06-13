@@ -31,6 +31,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+
                     <ImageView
                         android:id="@+id/img_kitchen"
                         android:layout_width="match_parent"
@@ -45,6 +46,16 @@
                         android:layout_centerInParent="true"
                         android:visibility="gone"
                         android:src="@drawable/tick" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/info_red_48"
+                        android:id="@+id/iv_info_deep_indoor"
+                        />
                 </RelativeLayout>
 
 
@@ -84,6 +95,15 @@
                         android:layout_centerInParent="true"
                         android:visibility="gone"
                         android:src="@drawable/tick" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/info_red_48"
+                        android:id="@+id/iv_info_just_indoor"
+                        />
                 </RelativeLayout>
 
                 <TextView
@@ -118,6 +138,15 @@
                         android:layout_height="180dp"
                         android:padding="5dp"
                         android:src="@drawable/balcony" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/iv_info_just_outdoor"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/info_red_48"
+                        />
 
                     <ImageView
                         android:id="@+id/tmg_tick_balcony"
@@ -163,6 +192,15 @@
                         android:layout_centerInParent="true"
                         android:visibility="gone"
                         android:src="@drawable/tick" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/info_red_48"
+                        android:id="@+id/iv_info_deep_outdoor"
+                        />
                 </RelativeLayout>
 
                 <TextView

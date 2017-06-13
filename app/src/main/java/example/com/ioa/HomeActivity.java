@@ -1,6 +1,7 @@
 package example.com.ioa;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -42,6 +45,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imgTickLiving;
     private ImageView imgTickOutdoor;
     private ImageView imgTickKitchen;
+    private ImageView info_just_indoor,info_deep_indoor,info_deep_outdoor,info_just_outdoor;
     private Button btnSubmit;
     private TextView current_position,next_away;
     private String selectedItem;
@@ -92,6 +96,11 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         imgTickLiving=(ImageView)findViewById(R.id.tmg_tick_living);
         imgTickOutdoor=(ImageView)findViewById(R.id.tmg_tick_out);
         btnSubmit=(Button)findViewById(R.id.btnSubmit);
+        info_deep_indoor=(ImageView)findViewById(R.id.iv_info_deep_indoor);
+        info_just_indoor=(ImageView)findViewById(R.id.iv_info_just_indoor);
+        info_deep_outdoor=(ImageView)findViewById(R.id.iv_info_deep_outdoor);
+        info_just_outdoor=(ImageView)findViewById(R.id.iv_info_just_outdoor);
+
         SeekBar mSeekbar = (SeekBar) findViewById(R.id.seekbar);
         final TextView txtv=(TextView)findViewById(R.id.txttime);
         current_position=(TextView) findViewById(R.id.tv_activity_home_next_current_pos);
@@ -131,8 +140,81 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 startAlarm();
             }
         });
+
+
+        info_just_indoor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            //flag=2
+
+                show_dialog(2);
+            }
+        });
+
+        info_deep_indoor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            //flag=1
+                show_dialog(1);
+
+            }
+        });
+
+        info_deep_outdoor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            //flag=4
+                show_dialog(4);
+
+            }
+        });
+
+        info_just_outdoor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            //flag=3
+                show_dialog(3);
+
+            }
+        });
     }
 
+    public void show_dialog(int flag)
+    {
+        final Dialog dialog = new Dialog(HomeActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setContentView(R.layout.dialog_info);
+        // Set dialog title
+        // set values for custom dialog components - text, image and button
+        final TextView info=(TextView) dialog.findViewById(R.id.tv_dialog_info);
+        switch(flag)
+        {
+            case 1:
+                info.setText("just indoor");
+                break;
+            case 2:
+                info.setText("deep indoor");
+                break;
+            case 3:
+                info.setText("just outdoor");
+                break;
+            case 4:
+                info.setText("deep outdoor");
+                break;
+        }
+
+        Button ok;
+        ok = (Button) dialog.findViewById(R.id.btn_ok);
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+    }
     public void captureRecord(String selectedItem)
     {
         if(null!=selectedItem) {

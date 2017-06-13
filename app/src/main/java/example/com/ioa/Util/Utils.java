@@ -276,6 +276,10 @@ public class Utils {
         captureData.setCqi(cqi);
         captureData.setWifijson(wifi_json);
 
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
+        captureData.setSending_timestamp(ts);
+
         captureData.setChargerConnected(isConnected(context)+"");
         captureData.setMobileNumber(Utils.getDataFromSharedPref(context,Utils.PHONE_NUMBER));
         captureData.setImei(getIMEI(context));
@@ -285,7 +289,6 @@ public class Utils {
         Iodata.setJsonData(cData);
 
         String data=gson.toJson(Iodata, IOAData.class);
-
         return data;
 
     }
