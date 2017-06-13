@@ -21,10 +21,26 @@ public class Enter_Phone_Number extends AppCompatActivity {
         setContentView(R.layout.enter_phone_number);
         phone_number=(EditText)findViewById(R.id.et_phone_number);
         submit=(Button)findViewById(R.id.btn_next);
+
+
+        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER)==null)
+        {
+
+        }
+        else
+        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER).equals(null))
+        {
+
+        }
+        else
+        {
+            Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
+            startActivity(intent);
+        }
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(phone_number.getText().equals(""))
+               if(phone_number.getText().equals(""))
                 {
                     Toast.makeText(getApplicationContext(),"Enter mobile number!",Toast.LENGTH_LONG).show();
                 }
@@ -38,7 +54,6 @@ public class Enter_Phone_Number extends AppCompatActivity {
                 }
                 else
                 {
-
                     Utils.saveDataInPref(getApplicationContext(),phone_number.getText().toString(),Utils.PHONE_NUMBER);
                     Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
                     startActivity(intent);

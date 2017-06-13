@@ -1,11 +1,15 @@
 package example.com.ioa.Util;
 
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
@@ -15,14 +19,18 @@ import android.telephony.CellInfoLte;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.TelephonyManager;
+import android.util.ArraySet;
 import android.util.Log;
 
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import example.com.ioa.Pojo.CaptureData;
 import example.com.ioa.Pojo.CellInfoData;
@@ -39,8 +47,10 @@ public class Utils {
     private static final String PREFNCES ="pref" ;
 
     public static final String NOTFICATION_TIME_KEY ="nfctime",PHONE_NUMBER="phone_number",NOTIFICATION_ON_OFF="notification_on_off",SELECTED_DAY="selected_day",START_TIME="start_time",END_TIME="end_time",CAPTURE_KEY= "capture_key";
-    private static String rsrp,rsrq,cqi,rssnr,rssi,sinr,ss,rxlevel;
+    private static String rsrp,rsrq,cqi,rssnr,rssi,sinr,ss,rxlevel,ta,wifi_json;
 
+
+    private static List<ScanResult> scanList;
     public static void sendDataToserver(Context context){
         Intent i = new Intent(context, SyncService.class);
         context.startService(i);
@@ -156,7 +166,8 @@ public class Utils {
                     cellObj.put("cellId", identityLte.getCi());
                     cellObj.put("tac", identityLte.getTac());
                     cellObj.put("dbm", lte.getDbm());
-
+                    cellObj.put("asulevel",lte.getAsuLevel());
+                    cellObj.put("level",lte.getLevel());
 
                     Log.v("data2",lte.toString());
 
@@ -209,14 +220,16 @@ public class Utils {
                                 cqi=cqi_seperated[1].trim();
                             }
                         }
-
-
+                        else if(k==6)
+                        {
+                            String[] ta_seperated=separated_data[k].split("=");
+                            if(ta_seperated[0].trim().equalsIgnoreCase("ta"))
+                            {
+                                ta=ta_seperated[1].trim();
+                            }
+                        }
                     }
-
                     //ss=31 rsrp=-85 rsrq=-20 rssnr=2147483647 cqi=2147483647 ta=2147483647
-
-
-
                     cellList.put(cellObj);
                 }
 
@@ -237,6 +250,8 @@ public class Utils {
             Utils.sendDataToserver(context);
     }
     private static String createJsonData(Context context,String btnName){
+
+        getWifiNetworksList(context);
         Gson gson =new Gson();
         CellInfoData cellInfo=Utils.getAllCellInfo(context);
         GpsData gpsdata=Utils.getAllGpsData(context);
@@ -257,10 +272,13 @@ public class Utils {
         captureData.setRxLevel(rxlevel);
         captureData.setSinr(sinr);
         captureData.setRssi(rssi);
+        captureData.setTa(ta);
+        captureData.setCqi(cqi);
+        captureData.setWifijson(wifi_json);
+
         captureData.setChargerConnected(isConnected(context)+"");
         captureData.setMobileNumber(Utils.getDataFromSharedPref(context,Utils.PHONE_NUMBER));
         captureData.setImei(getIMEI(context));
-
 
         Gson gson1=new Gson();
         String cData=gson1.toJson(captureData, CaptureData.class);
@@ -272,6 +290,65 @@ public class Utils {
 
     }
 
+    private static void getWifiNetworksList(Context context){
+        try
+        {
+        final String[] ssid = new String[1];
+        final String[] bssid = new String[1];
+        final String[] capablities = new String[1];
+        final String[] frequency = new String[1];
+        final String[] level = new String[1];
+        final String[] timestamp = new String[1];
+        final String distance;
+        final JSONArray jsonArray=new JSONArray();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        final WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+            wifiManager.startScan();
+
+            scanList = wifiManager.getScanResults();
+
+            Log.d("wifi length",scanList.size()+"");
+
+            HashSet<String> scanResultHashSet=new HashSet<>();
+
+            //sb.append("\n  Number Of Wifi connections :" + " " +scanList.size()+"\n\n");
+                for(int i = 0; i < scanList.size(); i++){
+                    bssid[0] =scanList.get(i).BSSID;
+                    ssid[0] =scanList.get(i).SSID;
+                    capablities[0]=scanList.get(i).capabilities;
+                    frequency[0] =scanList.get(i).frequency+"";
+                    level[0] =scanList.get(i).level+"";
+                   // timestamp[0] =scanList.get(i).timestamp+"";
+                    Log.d("wifi details",scanList.get(i).toString());
+
+                     JSONObject object=new JSONObject();
+                    try {
+                        object.put("ssid", ssid[0]);
+                        object.put("bssid",bssid[0]);
+                        object.put("capabilities",capablities[0]);
+                        object.put("frequency",frequency[0]);
+                        object.put("level",level[0]);
+                       // if(scanResultHashSet.add(ssid[0])==true) {
+                            jsonArray.put(object);
+                        //}
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                wifi_json=jsonArray.toString();
+
+                Log.d("wifi json",jsonArray.length()+wifi_json);
+        }
+        catch(Exception e)
+        {
+
+        }
+    }
     public static void saveDataInPref(Context context,String data,String key){
         SharedPreferences sharedpreferences = context.getSharedPreferences(PREFNCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();

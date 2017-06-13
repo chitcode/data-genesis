@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/btn_next"
         android:text="SUBMIT"
-        android:enabled="false"
+        android:enabled="true"
         android:layout_below="@id/et_phone_number"
         android:layout_centerHorizontal="true"
         android:textColor="#ffffff"

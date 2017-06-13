@@ -22,6 +22,50 @@ public class CaptureData {
     String postalcode;
     String address;
     String imei;
+    String cqi,ta,asulevel,level;
+    String wifijson;
+   // String
+
+
+    public String getWifijson() {
+        return wifijson;
+    }
+
+    public void setWifijson(String wifijson) {
+        this.wifijson = wifijson;
+    }
+
+    public String getCqi() {
+        return cqi;
+    }
+
+    public void setCqi(String cqi) {
+        this.cqi = cqi;
+    }
+
+    public String getTa() {
+        return ta;
+    }
+
+    public void setTa(String ta) {
+        this.ta = ta;
+    }
+
+    public String getAsulevel() {
+        return asulevel;
+    }
+
+    public void setAsulevel(String asulevel) {
+        this.asulevel = asulevel;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
 
     public String getImei() {
         return imei;
