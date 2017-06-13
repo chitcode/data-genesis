@@ -3,6 +3,7 @@ package example.com.ioa;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,20 +24,29 @@ public class Enter_Phone_Number extends AppCompatActivity {
         submit=(Button)findViewById(R.id.btn_next);
 
 
-        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER)==null)
+        if(Utils.getPhoneNumber(getApplicationContext()).equals(""))
         {
+            if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER)==null)
+            {
 
-        }
-        else
-        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER).equals(null))
-        {
+            }
+            else
+            if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER).equals(null))
+            {
 
+            }
+            else
+            {
+                nextPage();
+            }
         }
-        else
-        {
-            Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
-            startActivity(intent);
+        else{
+            String phone_number=Utils.getPhoneNumber(getApplicationContext());
+                Toast.makeText(getApplicationContext(),"Number found"+phone_number,Toast.LENGTH_LONG).show();
+            Utils.saveDataInPref(getApplicationContext(),phone_number,Utils.PHONE_NUMBER);
+            nextPage();
         }
+
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,10 +65,16 @@ public class Enter_Phone_Number extends AppCompatActivity {
                 else
                 {
                     Utils.saveDataInPref(getApplicationContext(),phone_number.getText().toString(),Utils.PHONE_NUMBER);
-                    Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
-                    startActivity(intent);
+                    nextPage();
                 }
             }
         });
+    }
+
+    private void nextPage()
+    {
+        Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
