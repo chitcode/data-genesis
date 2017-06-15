@@ -34,7 +34,7 @@ public class HttpUtil {
           //  stringBuilder.append("?record="+postdata);
             Log.d("postdata",postdata);
             Log.d("Url:",stringBuilder.toString()+"");
-           URL url = new URL(stringBuilder.toString());
+            URL url = new URL(stringBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept-Charset", "UTF-8");

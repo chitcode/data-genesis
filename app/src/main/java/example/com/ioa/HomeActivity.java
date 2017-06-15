@@ -258,9 +258,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void captureRecord(String selectedItem)
     {
         if(null!=selectedItem) {
-            Toast.makeText(this,"Your record is being sent",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"Your record is being sent",Toast.LENGTH_SHORT).show();
             Utils.performActionOnButtonClick(this, selectedItem);
-            Toast.makeText(this,"record captured",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this,"record captured",Toast.LENGTH_SHORT).show();
         }
         else
             Toast.makeText(this,"please select any image",Toast.LENGTH_SHORT).show();
@@ -388,6 +388,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String result) {
 
+            loading.cancel();
             if (flag1 != 0) {
                 output=result;
                 Log.d("output",output);
@@ -398,6 +399,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPreExecute() {
 
+            loading = ProgressDialog.show(ctx, "Status", "Loading Score...",true,false);
 
         }
     }
@@ -444,21 +446,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
             Log.d("errorstart",e+"");
         }
-       Toast.makeText(getApplicationContext(), "Start recording...",
-                Toast.LENGTH_SHORT).show();
+     ///  Toast.makeText(getApplicationContext(), "Start recording...",
+        //        Toast.LENGTH_SHORT).show();
     }
     public void stop(View view){
-
-        Toast.makeText(getApplicationContext(), "Stop recording...",
-                Toast.LENGTH_SHORT).show();
 
         try {
             myRecorder.stop();
             myRecorder.release();
             myRecorder  = null;
 
-            Toast.makeText(getApplicationContext(), "Stop recording...",
-                    Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(getApplicationContext(), "Stop recording...",
+            //        Toast.LENGTH_SHORT).show();
         } catch (IllegalStateException e) {
             Log.d("errorstop",e+"");
             e.printStackTrace();
@@ -521,8 +520,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         public void onFinish() {
 
             loading.cancel();
-
-            Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
             stop(view1);
 
             InputStream inputStream;
