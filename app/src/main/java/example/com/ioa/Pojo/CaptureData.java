@@ -1,5 +1,7 @@
 package example.com.ioa.Pojo;
 
+import java.util.ArrayList;
+
 /**
  * Created by Gunjan.K.Kumar on 28-05-2017.
  */
@@ -23,10 +25,28 @@ public class CaptureData {
     String address;
     String imei;
     String cqi,ta,asulevel,level;
-    String wifijson;
+    ArrayList<WifiData> wifijson;
     String sending_timestamp;
+    String gpsSatelliteData;
+    String audio_file_base64;
    // String
 
+
+    public String getAudio_file_base64() {
+        return audio_file_base64;
+    }
+
+    public void setAudio_file_base64(String audio_file_base64) {
+        this.audio_file_base64 = audio_file_base64;
+    }
+
+    public String getGpsSatelliteData() {
+        return gpsSatelliteData;
+    }
+
+    public void setGpsSatelliteData(String gpsSatelliteData) {
+        this.gpsSatelliteData = gpsSatelliteData;
+    }
 
     public String getSending_timestamp() {
         return sending_timestamp;
@@ -36,12 +56,12 @@ public class CaptureData {
         this.sending_timestamp = sending_timestamp;
     }
 
-    public String getWifijson() {
-        return wifijson;
+    public void setWifijson(ArrayList<WifiData> wifijson) {
+        this.wifijson = wifijson;
     }
 
-    public void setWifijson(String wifijson) {
-        this.wifijson = wifijson;
+    public ArrayList<WifiData> getWifijson() {
+        return wifijson;
     }
 
     public String getCqi() {

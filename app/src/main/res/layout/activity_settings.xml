@@ -105,7 +105,8 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_below="@+id/tv_seekbar1_value"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:max="55"/>
 
         <RadioGroup
             android:layout_width="match_parent"

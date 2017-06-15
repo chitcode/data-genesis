@@ -8,6 +8,16 @@ public class WifiData {
 
     String ssid,bssid,capablities,frequency,level,timestamp,distance;
 
+    public WifiData(String ssid,String bssid,String capablities,String frequency,String level,String timestamp)
+    {
+        setBssid(bssid);
+        setSsid(ssid);
+        setCapablities(capablities);
+        setFrequency(frequency);
+        setLevel(level);
+        setTimestamp(timestamp);
+    }
+
     public void setSsid(String ssid) {
         this.ssid = ssid;
     }

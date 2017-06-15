@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -41,6 +42,7 @@ public class Settings extends AppCompatActivity {
     private Button save,select_day;
     private ArrayList<String> selected_day_array;
     private String json_day=null;
+    private String stored_notification_value;
     private Boolean boolean_notification_on_off;
     private CheckBox cb_notification_on_off;
     private String start_date,end_date,start_time,end_time,notification_value,capture_duration,capture;
@@ -62,6 +64,16 @@ public class Settings extends AppCompatActivity {
         seekBar_notification=(SeekBar)findViewById(R.id.seekBar_notification);
         notification_text=(TextView)findViewById(R.id.tv_seekbar1_value);
         duration_text=(TextView)findViewById(R.id.tv_seekbar2_value);
+
+        if(TextUtils.isEmpty(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY))){
+            //default notification time
+        }
+        else {
+            stored_notification_value=Utils.getDataFromSharedPref(getApplicationContext(),Utils.NOTFICATION_TIME_KEY);
+            notification_text.setText(stored_notification_value);
+            seekBar_notification.setProgress((int)(Integer.parseInt(stored_notification_value)));
+        }
+
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
 
             @Override
@@ -146,10 +158,10 @@ public class Settings extends AppCompatActivity {
         {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
-                progress=(int)(progress*0.6);
+                progress=(int)(progress+5);
+
                 notification_value=progress+"";
                 notification_text.setText("Notification Time: "+progress+" Min");
-
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {}

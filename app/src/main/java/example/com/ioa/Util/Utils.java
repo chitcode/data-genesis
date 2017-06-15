@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
@@ -28,7 +30,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -36,19 +40,21 @@ import example.com.ioa.Pojo.CaptureData;
 import example.com.ioa.Pojo.CellInfoData;
 import example.com.ioa.Pojo.GpsData;
 import example.com.ioa.Pojo.IOAData;
+import example.com.ioa.Pojo.SatelliteData;
+import example.com.ioa.Pojo.WifiData;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
 /**
  * Created by Gunjan.K.Kumar on 28-05-2017.
  */
-public class Utils {
+public class Utils{
 
     private static final String PREFNCES ="pref" ;
-
+    private static ArrayList<WifiData> wifiDataArrayList;
     public static final String NOTFICATION_TIME_KEY ="nfctime",PHONE_NUMBER="phone_number",NOTIFICATION_ON_OFF="notification_on_off",SELECTED_DAY="selected_day",START_TIME="start_time",END_TIME="end_time",CAPTURE_KEY= "capture_key";
     private static String rsrp,rsrq,cqi,rssnr,rssi,sinr,ss,rxlevel,ta,wifi_json;
-
+    public static final String FILE_BASE64_KEY="file_base64";
 
     private static List<ScanResult> scanList;
     public static void sendDataToserver(Context context){
@@ -233,7 +239,6 @@ public class Utils {
                     cellList.put(cellObj);
                 }
 
-
             } catch (Exception ex) {
 
             }
@@ -253,6 +258,7 @@ public class Utils {
 
         getWifiNetworksList(context);
         Gson gson =new Gson();
+
         CellInfoData cellInfo=Utils.getAllCellInfo(context);
         GpsData gpsdata=Utils.getAllGpsData(context);
         IOAData Iodata=new IOAData();
@@ -274,8 +280,12 @@ public class Utils {
         captureData.setRssi(rssi);
         captureData.setTa(ta);
         captureData.setCqi(cqi);
-        captureData.setWifijson(wifi_json);
-
+        captureData.setGpsSatelliteData(getGpsSatelliteInfo(context));
+        captureData.setAudio_file_base64(Utils.getDataFromSharedPref(context,Utils.FILE_BASE64_KEY));
+        if(wifiDataArrayList.size()!=0) {
+           captureData.setWifijson(wifiDataArrayList);
+            Log.d("wifidata1", wifiDataArrayList.size() + "" + wifiDataArrayList.get(0).getSsid());
+        }
         Long tsLong = System.currentTimeMillis()/1000;
         String ts = tsLong.toString();
         captureData.setSending_timestamp(ts);
@@ -296,6 +306,7 @@ public class Utils {
     private static void getWifiNetworksList(Context context){
         try
         {
+
         final String[] ssid = new String[1];
         final String[] bssid = new String[1];
         final String[] capablities = new String[1];
@@ -304,6 +315,8 @@ public class Utils {
         final String[] timestamp = new String[1];
         final String distance;
         final JSONArray jsonArray=new JSONArray();
+
+            wifiDataArrayList= new ArrayList<>();
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
@@ -323,7 +336,7 @@ public class Utils {
                     capablities[0]=scanList.get(i).capabilities;
                     frequency[0] =scanList.get(i).frequency+"";
                     level[0] =scanList.get(i).level+"";
-                   // timestamp[0] =scanList.get(i).timestamp+"";
+                    timestamp[0] =scanList.get(i).timestamp+"";
                     Log.d("wifi details",scanList.get(i).toString());
 
                      JSONObject object=new JSONObject();
@@ -337,15 +350,16 @@ public class Utils {
                             jsonArray.put(object);
                         //}
 
+                        WifiData wifiDataobject=new WifiData(ssid[0],bssid[0],capablities[0],frequency[0],level[0],timestamp[0]);
+                        wifiDataArrayList.add(wifiDataobject);
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
                 }
-
                 wifi_json=jsonArray.toString();
-
-                Log.d("wifi json",jsonArray.length()+wifi_json);
+                Log.d("wifidata",wifiDataArrayList.size()+"");
         }
         catch(Exception e)
         {
@@ -358,8 +372,6 @@ public class Utils {
         editor.putString(key,data);
         editor.commit();
     }
-
-
 
     public static String getDataFromSharedPref(Context context,String key){
         SharedPreferences sharedpreferences = context.getSharedPreferences(PREFNCES, Context.MODE_PRIVATE);
@@ -382,6 +394,44 @@ public class Utils {
     {
         TelephonyManager mngr = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
         return mngr.getDeviceId();
+    }
+
+
+    static String getGpsSatelliteInfo(Context context)
+    {
+        LocationManager locationManager = null;
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        JSONObject object=new JSONObject();
+        JSONArray jsonArray=new JSONArray();
+        if(isGPSEnabled(context))
+        {
+            GpsStatus gpsStatus = locationManager.getGpsStatus(null);
+            if (gpsStatus != null) {
+                Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
+                Iterator<GpsSatellite> sat = satellites.iterator();
+                int i = 0;
+                while (sat.hasNext()) {
+                    GpsSatellite satellite = sat.next();
+                   //String prn,snr,azimuth,elevation,usedinfix;
+
+                    try {
+                        object.put("prn",satellite.getPrn());
+                        object.put("snr",satellite.getSnr());
+                        object.put("azimuth",satellite.getAzimuth());
+                        object.put("elevation",satellite.getElevation());
+                        jsonArray.put(object);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Log.d("gpssatellitedata",jsonArray+"");
+                return jsonArray.toString();
+            }
+        }
+
+        return "null";
     }
 
 

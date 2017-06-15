@@ -1,15 +1,28 @@
 package example.com.ioa;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,13 +40,23 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import example.com.ioa.Util.Utils;
+
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static java.sql.DriverManager.println;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,11 +70,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView imgTickKitchen;
     private ImageView info_just_indoor,info_deep_indoor,info_deep_outdoor,info_just_outdoor;
     private Button btnSubmit;
+    private ProgressDialog loading;
     private TextView current_position,next_away;
     private String selectedItem;
     private String output="";
     private JSONObject jsonObject;
+    private MediaRecorder myRecorder;
+    private MediaPlayer myPlayer;
     AsyncTaskSync1 async_obj;
+    private String temp_path;
+    Random random ;
+    private Context ctx;
+    private View view1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +91,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         updateTextView();
         if(TextUtils.isEmpty(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY)))
         startAlarm();
+
+      //  asyncTaskRecord=new AsyncTaskRecord();
+        //asyncTaskRecord.execute();
 
     }
 // TO DO MODIFY ACORDING TO NEW SETTING SCREEN
@@ -85,8 +118,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     private void initView(){
+
+        random=new Random();
         imgBalcony=(ImageView)findViewById(R.id.img_balcony);
         imgKitchen=(ImageView)findViewById(R.id.img_kitchen);
         imgLiving=(ImageView)findViewById(R.id.img_living);
@@ -100,18 +134,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         info_just_indoor=(ImageView)findViewById(R.id.iv_info_just_indoor);
         info_deep_outdoor=(ImageView)findViewById(R.id.iv_info_deep_outdoor);
         info_just_outdoor=(ImageView)findViewById(R.id.iv_info_just_outdoor);
-
         SeekBar mSeekbar = (SeekBar) findViewById(R.id.seekbar);
         final TextView txtv=(TextView)findViewById(R.id.txttime);
         current_position=(TextView) findViewById(R.id.tv_activity_home_next_current_pos);
         next_away=(TextView)findViewById(R.id.tv_activity_home_next_position);
-
         imgBalcony.setOnClickListener(this);
         imgKitchen.setOnClickListener(this);
         imgLiving.setOnClickListener(this);
         imgOutdoor.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
-
+        ctx=this;
         if(TextUtils.isEmpty(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY)))
         Utils.saveDataInPref(HomeActivity.this,"5",Utils.NOTFICATION_TIME_KEY);//default notification time
         else {
@@ -146,7 +178,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
             //flag=2
-
                 show_dialog(2);
             }
         });
@@ -188,19 +219,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         // Set dialog title
         // set values for custom dialog components - text, image and button
         final TextView info=(TextView) dialog.findViewById(R.id.tv_dialog_info);
+        final TextView info1=(TextView) dialog.findViewById(R.id.tv_dialog_info_1);
         switch(flag)
         {
             case 1:
-                info.setText("just indoor");
+                info1.setVisibility(View.VISIBLE);
+                info.setText("Bounded by multiple walls");
+                info1.setText("Away from window ( more than 2 meters)");
+
+
                 break;
             case 2:
-                info.setText("deep indoor");
+                info.setText("Indoor but close to window pane (less than 2 meters)");
+                info1.setVisibility(View.GONE);
                 break;
             case 3:
-                info.setText("just outdoor");
+                info1.setVisibility(View.VISIBLE);
+                info.setText("Outdoor but close to building");
+                info1.setText("Outdoor but surrounded by buildings");
                 break;
             case 4:
-                info.setText("deep outdoor");
+                info.setText("On Road or open spaces ");
+                info1.setVisibility(View.GONE);
                 break;
         }
 
@@ -238,6 +278,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if(next_away_string!=null)
         next_away.setText("Next Position away:"+next_away_string);
     }
+
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -247,7 +289,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.GONE);
                 imgTickOutdoor.setVisibility(View.GONE);
-                captureRecord(selectedItem);
+                start_record_send(v);
                 break;
             case R.id.img_kitchen:
                 selectedItem="Kitchen";
@@ -255,7 +297,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickOutdoor.setVisibility(View.GONE);
                 imgTickKitchen.setVisibility(View.VISIBLE);
                 imgTickLiving.setVisibility(View.GONE);
-                captureRecord(selectedItem);
+                start_record_send(v);
                 break;
             case R.id.img_living:
                 selectedItem="Living";
@@ -263,7 +305,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.VISIBLE);
                 imgTickOutdoor.setVisibility(View.GONE);
-               captureRecord(selectedItem);
+                start_record_send(v);
                 break;
             case R.id.img_outdoor:
                 selectedItem="OutDoor";
@@ -271,7 +313,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.GONE);
                 imgTickOutdoor.setVisibility(View.VISIBLE);
-                captureRecord(selectedItem);
+                start_record_send(v);
                 break;
            case R.id.btnSubmit:
             /* if(null!=selectedItem) {
@@ -281,16 +323,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                else
                Toast.makeText(this,"please select any image",Toast.LENGTH_SHORT).show();
 */
+
+
               String device_id=Utils.getDeviceid(getApplicationContext());
                async_obj=new AsyncTaskSync1();
                async_obj.execute(device_id);
+
+
                break;
 
         }
 
     }
 
+    void start_record_send(View v)
+    {
+        this.view1=v;
+        start_recording(view1);
+        loading = ProgressDialog.show(ctx, "Status", "Sending Data...",true,false);
 
+        countDownTimer.start();
+    }
     class AsyncTaskSync1 extends AsyncTask<String, Void, String> {
 
         int flag = 0, flag1 = 1;
@@ -374,6 +427,61 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    public void start_recording(View view){
+
+        String path;
+        try {
+
+            temp_path=MediaRecorderReady();
+            myRecorder.prepare();
+            myRecorder.start();
+        } catch (IllegalStateException e) {
+            // start:it is called before prepare()
+            // prepare: it is called after start() or before setOutputFormat()
+            e.printStackTrace();
+            Log.d("errorstart",e+"");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d("errorstart",e+"");
+        }
+       Toast.makeText(getApplicationContext(), "Start recording...",
+                Toast.LENGTH_SHORT).show();
+    }
+    public void stop(View view){
+
+        Toast.makeText(getApplicationContext(), "Stop recording...",
+                Toast.LENGTH_SHORT).show();
+
+        try {
+            myRecorder.stop();
+            myRecorder.release();
+            myRecorder  = null;
+
+            Toast.makeText(getApplicationContext(), "Stop recording...",
+                    Toast.LENGTH_SHORT).show();
+        } catch (IllegalStateException e) {
+            Log.d("errorstop",e+"");
+            e.printStackTrace();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            Log.d("errorstop",e+"");
+        }
+
+    }
+    public byte[] toByteArray(InputStream in) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int read = 0;
+        byte[] buffer = new byte[1024];
+        while (read != -1) {
+            read = in.read(buffer);
+            if (read != -1)
+                out.write(buffer,0,read);
+        }
+        out.close();
+        return out.toByteArray();
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -399,5 +507,71 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
         super.onStop();
     }
+
+
+    CountDownTimer countDownTimer=  new CountDownTimer(3000,1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            // do when countdown timer is started like show progressbar
+
+        }
+
+        @Override
+        public void onFinish() {
+
+            loading.cancel();
+
+            Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
+            stop(view1);
+
+            InputStream inputStream;
+            try {
+                inputStream = getContentResolver().openInputStream(Uri.fromFile(new File(temp_path)));
+                byte[] soundBytes = new byte[inputStream.available()];
+
+                soundBytes = toByteArray(inputStream);
+                String base64 = Base64.encodeToString(soundBytes, Base64.DEFAULT);
+                Log.d("bytes1",soundBytes.toString()+" "+base64);
+
+                Utils.saveDataInPref(ctx,base64,Utils.FILE_BASE64_KEY);
+                captureRecord(selectedItem);
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //write what ever you want to do after completing time like hiding progress bar
+        }
+    };
+
+    String AudioSavePathInDevice = null;
+    public String MediaRecorderReady(){
+
+        if(checkPermission()) {
+            Log.d("abcabc1","1");
+            AudioSavePathInDevice =
+                    Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+                            "AudioRecording.mp3";
+            myRecorder = new MediaRecorder();
+            myRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            myRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4;
+            myRecorder.setAudioEncoder(MediaRecorder.OutputFormat.DEFAULT);
+            myRecorder.setOutputFile(AudioSavePathInDevice);
+        }
+        return AudioSavePathInDevice;
+    }
+
+    public boolean checkPermission() {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
+                WRITE_EXTERNAL_STORAGE);
+        int result1 = ContextCompat.checkSelfPermission(getApplicationContext(),
+                RECORD_AUDIO);
+        return result == PackageManager.PERMISSION_GRANTED &&
+                result1 == PackageManager.PERMISSION_GRANTED;
+    }
 }
+
 
