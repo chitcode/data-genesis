@@ -20,8 +20,8 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class HttpUtil {
 
-    private static final String POST_URL ="http://192.168.43.79:5000/push" ;
-   // private static final String POST_URL ="http://indooroutdoor.herokuapp.com/push" ;
+   // private static final String POST_URL ="http://192.168.43.79:5000/push" ;
+    private static final String POST_URL ="http://indooroutdoor.herokuapp.com/push" ;
     private static final String SYNC_URL ="http://indooroutdoor.herokuapp.com/stats/" ;
 
     public String sendPostRequest(String postdata){

@@ -557,7 +557,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                             "AudioRecording.mp3";
             myRecorder = new MediaRecorder();
             myRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            myRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4;
+            myRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             myRecorder.setAudioEncoder(MediaRecorder.OutputFormat.DEFAULT);
             myRecorder.setOutputFile(AudioSavePathInDevice);
         }
