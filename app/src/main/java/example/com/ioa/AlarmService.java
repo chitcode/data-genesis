@@ -33,8 +33,6 @@ public class AlarmService extends IntentService {
         setNotificationHandler(R.id.btn2);
         setNotificationHandler(R.id.btn3);
         setNotificationHandler(R.id.btn4);
-
-
     }
 
 
@@ -48,7 +46,7 @@ public class AlarmService extends IntentService {
         RemoteViews notificationView = new RemoteViews(getPackageName(), R.layout.notification);
 
         NotificationCompat.Builder builder = (NotificationCompat.Builder)
-                new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher).
+                new NotificationCompat.Builder(this).setSmallIcon(R.drawable.app_logo).
                         setTicker("Ticker Text").setContent(notificationView) .setAutoCancel(true);
 
 

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -87,6 +88,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#303F9F")));
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ff8c00")));
         initView();
         updateTextView();
         if(TextUtils.isEmpty(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY)))
@@ -150,7 +152,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             mSeekbar.setProgress(Integer.parseInt(Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY)));
         }
 
-        txtv.setText("Notification Time: "+Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY)+" Min");
+        txtv.setText(""+Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY)+" Min");
 
 
         mSeekbar.setOnSeekBarChangeListener(new CustomSeekBar.OnSeekBarChangeListener()
@@ -158,7 +160,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
                 progress=progress+5;
-                txtv.setText("Notification Time: "+progress+" Min");
+                txtv.setText(""+progress+" Min");
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -167,7 +169,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 int progress=seekBar.getProgress()+5;
                 Utils.saveDataInPref(HomeActivity.this,progress+"",Utils.NOTFICATION_TIME_KEY);
                 Toast.makeText(HomeActivity.this,"notification time set to "+  progress+" min",Toast.LENGTH_SHORT).show();
-                txtv.setText("Notification Time: "+progress+" Min");
+                txtv.setText(""+progress+" Min");
                 stopAlarm();
                 startAlarm();
             }
@@ -289,7 +291,29 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.GONE);
                 imgTickOutdoor.setVisibility(View.GONE);
-                start_record_send(v);
+                if(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)!=null) {
+                    long time= System.currentTimeMillis();
+                    time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
+                    Log.d("time1",time+"");
+                    if(time>=0)
+                        start_record_send(v);
+                }
+                else
+                {
+                    Log.d("time1","null");
+                    start_record_send(v);
+                }
+
+                Snackbar snackbar = Snackbar
+                        .make(v, "Thank You!", Snackbar.LENGTH_LONG).setActionTextColor(Color.YELLOW)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                Utils.saveDataInPref(ctx,"1",Utils.UNDO_OPTION);
+                            }
+                        });
+                snackbar.show();
                 break;
             case R.id.img_kitchen:
                 selectedItem="Kitchen";
@@ -297,7 +321,27 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickOutdoor.setVisibility(View.GONE);
                 imgTickKitchen.setVisibility(View.VISIBLE);
                 imgTickLiving.setVisibility(View.GONE);
-                start_record_send(v);
+                if(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)!=null) {
+                    long time= System.currentTimeMillis();
+                    time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
+                    Log.d("time1",time+"");
+                    if(time>=0)
+                        start_record_send(v);
+                }
+                else
+                {
+                    Log.d("time1","null");
+                    start_record_send(v);
+                }
+                snackbar = Snackbar
+                        .make(v, "Thank You!", Snackbar.LENGTH_LONG).setActionTextColor(Color.YELLOW)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Utils.saveDataInPref(ctx,"1",Utils.UNDO_OPTION);
+                            }
+                        });
+                snackbar.show();
                 break;
             case R.id.img_living:
                 selectedItem="Living";
@@ -305,16 +349,60 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.VISIBLE);
                 imgTickOutdoor.setVisibility(View.GONE);
-                start_record_send(v);
+                if(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)!=null) {
+                    long time= System.currentTimeMillis();
+                    time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
+                    Log.d("time1",time+"");
+                    if(time>=0)
+                        start_record_send(v);
+                }
+                else
+                {
+                    Log.d("time1","null");
+                    start_record_send(v);
+                }
+                snackbar = Snackbar
+                        .make(v, "Thank You!", Snackbar.LENGTH_LONG).setActionTextColor(Color.YELLOW)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Utils.saveDataInPref(ctx,"1",Utils.UNDO_OPTION);
+                            }
+                        });
+                snackbar.show();
                 break;
+
             case R.id.img_outdoor:
                 selectedItem="OutDoor";
                 imgTickBalcony.setVisibility(View.GONE);
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.GONE);
                 imgTickOutdoor.setVisibility(View.VISIBLE);
-                start_record_send(v);
+                if(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)!=null) {
+                    long time= System.currentTimeMillis();
+                    time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
+                    Log.d("time1",time+"");
+                    if(time>=0)
+                        start_record_send(v);
+                }
+                else
+                {
+                    Log.d("time1","null");
+                    start_record_send(v);
+                }
+                snackbar = Snackbar
+                        .make(v, "Thank You!", Snackbar.LENGTH_LONG).setActionTextColor(Color.YELLOW)
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Utils.saveDataInPref(ctx,"1",Utils.UNDO_OPTION);
+                            }
+
+                        });
+                snackbar.show();
+
                 break;
+
            case R.id.btnSubmit:
             /* if(null!=selectedItem) {
                    Utils.performActionOnButtonClick(this, selectedItem);
@@ -340,7 +428,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     {
         this.view1=v;
         start_recording(view1);
-        loading = ProgressDialog.show(ctx, "Status", "Sending Data...",true,false);
+        long current_timestamp= System.currentTimeMillis();
+        Utils.saveDataInPref(ctx,current_timestamp+"",Utils.LAST_DATA_SENT_TIMESTAMP);
+        //loading = ProgressDialog.show(ctx, "Status", "Sending Data...",true,false);
 
         countDownTimer.start();
     }
@@ -481,7 +571,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @Override
+   /* @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.home_activity_menu, menu);//Menu Resource, Menu
@@ -496,7 +586,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
         return true;
-    }
+    }*/
     @Override
     protected void onStop()
     {
@@ -519,7 +609,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onFinish() {
 
-            loading.cancel();
             stop(view1);
 
             InputStream inputStream;

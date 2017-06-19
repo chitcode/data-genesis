@@ -8,11 +8,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
 import android.telephony.CellInfo;
@@ -30,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +46,7 @@ import example.com.ioa.Pojo.IOAData;
 import example.com.ioa.Pojo.SatelliteData;
 import example.com.ioa.Pojo.WifiData;
 
+import static android.content.Context.CONTEXT_IGNORE_SECURITY;
 import static android.content.Context.TELEPHONY_SERVICE;
 
 /**
@@ -54,7 +58,8 @@ public class Utils{
     private static ArrayList<WifiData> wifiDataArrayList;
     public static final String NOTFICATION_TIME_KEY ="nfctime",PHONE_NUMBER="phone_number",NOTIFICATION_ON_OFF="notification_on_off",SELECTED_DAY="selected_day",START_TIME="start_time",END_TIME="end_time",CAPTURE_KEY= "capture_key";
     private static String rsrp,rsrq,cqi,rssnr,rssi,sinr,ss,rxlevel,ta,wifi_json;
-    public static final String FILE_BASE64_KEY="file_base64";
+    public static final String LAST_INSERT_ID="last_insert_id",UNDO_OPTION="undo_option";//undo_option=1 if undo pending else uundo_option=0
+    public static final String FILE_BASE64_KEY="file_base64",LAST_DATA_SENT_TIMESTAMP="last_data_sent_timestamp";
 
     private static List<ScanResult> scanList;
     public static void sendDataToserver(Context context){
@@ -72,15 +77,23 @@ public class Utils{
     public static GpsData getAllGpsData(Context context){
 
         GpsData gpsdata=new GpsData();
+
         GPSTracker gpsTracker = new GPSTracker(context);
+        LocationManager locationManager = null;
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (gpsTracker.getIsGPSTrackingEnabled())
         {
             String stringLatitude = String.valueOf(gpsTracker.latitude);
             gpsdata.setLattitude(stringLatitude);
 
+
+
             String stringLongitude = String.valueOf(gpsTracker.longitude);
             gpsdata.setLongitude(stringLongitude);
+            Log.d("gpsdata", stringLatitude+" "+stringLongitude);
+
 
             String country = gpsTracker.getCountryName(context);
             gpsdata.setCountry(country);
@@ -93,6 +106,18 @@ public class Utils{
 
             String addressLine = gpsTracker.getAddressLine(context);
             gpsdata.setAddress(addressLine);
+            if(location!=null) {
+
+                String altitude = location.getAltitude() + "";
+                String accuracy = location.getAccuracy() + "";
+                String speed = location.getSpeed() + "";
+
+                gpsdata.setAccuracy(accuracy);
+                gpsdata.setAltitude(altitude);
+                gpsdata.setSpeed(speed);
+                Log.d("gpsdata", altitude + " " + accuracy + " " + speed);
+            }
+
         }
         return gpsdata;
     }
@@ -107,6 +132,16 @@ public class Utils{
         final TelephonyManager tm = (TelephonyManager) context.getSystemService(TELEPHONY_SERVICE);
         final String phoneNumber = tm.getLine1Number();
         return phoneNumber;
+    }
+    public static String getOperatorName(Context context)
+    {
+        TelephonyManager tManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+
+// Get carrier name (Network Operator Name)
+        String carrierName = tManager.getNetworkOperatorName();
+        Log.d("operator_name",carrierName);
+
+        return carrierName;
     }
 
 
@@ -171,10 +206,12 @@ public class Utils{
                     CellIdentityLte identityLte = ((CellInfoLte) info).getCellIdentity();
                     cellObj.put("cellId", identityLte.getCi());
                     cellObj.put("tac", identityLte.getTac());
+                    cellObj.put("pci",identityLte.getPci());
+                    cellObj.put("mnc",identityLte.getMnc());
+                    cellObj.put("mcc",identityLte.getMcc());
                     cellObj.put("dbm", lte.getDbm());
                     cellObj.put("asulevel",lte.getAsuLevel());
                     cellObj.put("level",lte.getLevel());
-
                     Log.v("data2",lte.toString());
 
                     rssi=lte.getDbm()+"";
@@ -264,6 +301,7 @@ public class Utils{
         IOAData Iodata=new IOAData();
         CaptureData captureData=new CaptureData();
         captureData.setBtntype(btnName);
+        Log.d("button name",btnName);
         captureData.setUserid(Utils.getDeviceid(context));
         captureData.setGpsStatus(Utils.isGPSEnabled(context)+"");
         captureData.setCellInfo(cellInfo.getCellInfoArray());
@@ -274,13 +312,19 @@ public class Utils{
         captureData.setAddress(gpsdata.getAddress());
         captureData.setPostalcode(gpsdata.getPincode());
         captureData.setCity(gpsdata.getCity());
+        captureData.setAltitude(gpsdata.getAltitude());
+        captureData.setAccuracy(gpsdata.getAccuracy());
+        captureData.setSpeed(gpsdata.getSpeed());
         captureData.setRssrp(rsrp);
         captureData.setRxLevel(rxlevel);
         captureData.setSinr(sinr);
         captureData.setRssi(rssi);
         captureData.setTa(ta);
         captureData.setCqi(cqi);
+        captureData.setDevice_model(getDeviceName());
+        captureData.setAndroid_version(getAndroidVersion());
         captureData.setGpsSatelliteData(getGpsSatelliteInfo(context));
+        captureData.setOperator_name(getOperatorName(context));
         captureData.setAudio_file_base64(Utils.getDataFromSharedPref(context,Utils.FILE_BASE64_KEY));
         if(wifiDataArrayList.size()!=0) {
            captureData.setWifijson(wifiDataArrayList);
@@ -290,7 +334,10 @@ public class Utils{
         String ts = tsLong.toString();
         captureData.setSending_timestamp(ts);
 
-        captureData.setChargerConnected(isConnected(context)+"");
+        ArrayList<String> battery_details=isConnected(context);
+        captureData.setChargerConnected(battery_details.get(2));
+        captureData.setVoltage(battery_details.get(1));
+        captureData.setTemprature(battery_details.get(0));
         captureData.setMobileNumber(Utils.getDataFromSharedPref(context,Utils.PHONE_NUMBER));
         captureData.setImei(getIMEI(context));
 
@@ -377,10 +424,24 @@ public class Utils{
         SharedPreferences sharedpreferences = context.getSharedPreferences(PREFNCES, Context.MODE_PRIVATE);
         return sharedpreferences.getString(key,null);
     }
-    public static boolean isConnected(Context context) {
+    public static ArrayList<String> isConnected(Context context) {
         Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        String temperature=intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE,-1)+"";
+        String voltage=intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE,-1)+"";
         int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
+        String plugged_in="false";
+        if(plugged==BatteryManager.BATTERY_PLUGGED_AC)
+            plugged_in="AC";
+        else if(plugged==BatteryManager.BATTERY_PLUGGED_USB)
+            plugged_in="USB";
+        else if(plugged==BatteryManager.BATTERY_PLUGGED_WIRELESS)
+            plugged_in="WIRELESS";
+
+        ArrayList<String> arrayList_battery=new ArrayList<>();
+        arrayList_battery.add(temperature);
+        arrayList_battery.add(voltage);
+        arrayList_battery.add(plugged_in);
+        return arrayList_battery;
     }
 
     public  static String getPhoneNumber(Context context)
@@ -401,6 +462,7 @@ public class Utils{
     {
         LocationManager locationManager = null;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         JSONObject object=new JSONObject();
         JSONArray jsonArray=new JSONArray();
@@ -425,14 +487,42 @@ public class Utils{
                         e.printStackTrace();
                     }
                 }
-
                 Log.d("gpssatellitedata",jsonArray+"");
                 return jsonArray.toString();
             }
         }
-
         return "null";
     }
 
+    public static String getAndroidVersion() {
+        String release = Build.VERSION.RELEASE;
+        int sdkVersion = Build.VERSION.SDK_INT;
+        Log.d("sdkversion1",sdkVersion+" "+release);
+        return sdkVersion+"";
+    }
 
+    public static String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return capitalize(model);
+        } else {
+            return capitalize(manufacturer) + " " + model;
+        }
+    }
+
+
+    public static String capitalize(String s) {
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        char first = s.charAt(0);
+        if (Character.isUpperCase(first)) {
+            Log.d("model1",s);
+            return s;
+        } else {
+            Log.d("model1",Character.toUpperCase(first) + s.substring(1));
+            return Character.toUpperCase(first) + s.substring(1);
+        }
+    }
 }

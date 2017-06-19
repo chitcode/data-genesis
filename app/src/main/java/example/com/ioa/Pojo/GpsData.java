@@ -10,6 +10,32 @@ public class GpsData {
     String country;
     String pincode;
     String address;
+    String accuracy,speed,altitude;
+
+
+    public String getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(String accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public String getAltitude() {
+        return altitude;
+    }
+
+    public void setAltitude(String altitude) {
+        this.altitude = altitude;
+    }
 
     public String getCountry() {
         return country;

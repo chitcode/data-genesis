@@ -12,9 +12,11 @@ public class CaptureData {
     String sinr;
     String cellid;
     String chargerConnected;
+    String voltage,temprature;
     String gpsStatus;
     String lattitude;
     String longitude;
+    String altitude,speed,accuracy;
     String latency;
     String rxLevel;
     String psc;
@@ -29,8 +31,73 @@ public class CaptureData {
     String sending_timestamp;
     String gpsSatelliteData;
     String audio_file_base64;
-   // String
+    String device_model,android_version;
+    String operator_name;
 
+    public void setAltitude(String altitude) {
+        this.altitude = altitude;
+    }
+
+    public String getAltitude() {
+        return altitude;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
+    public void setAccuracy(String accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public String getAccuracy() {
+        return accuracy;
+    }
+
+    public String getOperator_name() {
+        return operator_name;
+    }
+
+    public void setOperator_name(String operator_name) {
+        this.operator_name = operator_name;
+    }
+
+
+    public String getVoltage() {
+        return voltage;
+    }
+
+    public void setVoltage(String voltage) {
+        this.voltage = voltage;
+    }
+
+    public String getTemprature() {
+        return temprature;
+    }
+
+    public void setTemprature(String temprature) {
+        this.temprature = temprature;
+    }
+
+    public String getDevice_model() {
+        return device_model;
+    }
+
+    public void setDevice_model(String device_model) {
+        this.device_model = device_model;
+    }
+
+    public String getAndroid_version() {
+        return android_version;
+    }
+
+    public void setAndroid_version(String android_version) {
+        this.android_version = android_version;
+    }
 
     public String getAudio_file_base64() {
         return audio_file_base64;

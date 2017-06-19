@@ -1,7 +1,13 @@
 package example.com.ioa.Util;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,10 +26,16 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class HttpUtil {
 
-   // private static final String POST_URL ="http://192.168.43.79:5000/push" ;
-    private static final String POST_URL ="http://indooroutdoor.herokuapp.com/push" ;
+    private AsyncTaskSyncUndo asyncTaskSyncUndo;
+    private static final String POST_URL ="http://192.168.43.79:5000/push" ;
+   // private static final String POST_URL ="http://indooroutdoor.herokuapp.com/push" ;
     private static final String SYNC_URL ="http://indooroutdoor.herokuapp.com/stats/" ;
-
+    private Context context;
+    private String inserted_id;
+    public HttpUtil(Context context)
+    {
+        this.context=context;
+    }
     public String sendPostRequest(String postdata){
         String response = null;
 
@@ -71,10 +83,22 @@ public class HttpUtil {
         finally
         {
             Log.d("urlresponse","final");
-
-            try
+            if(response!=null)
             {
 
+                if(Utils.getDataFromSharedPref(context,Utils.UNDO_OPTION)!=null) {
+                    if (Utils.getDataFromSharedPref(context, Utils.UNDO_OPTION).equals("1")) {
+                        Utils.saveDataInPref(context, "0", Utils.UNDO_OPTION);
+                        inserted_id=decode_details(response);
+                        asyncTaskSyncUndo=new AsyncTaskSyncUndo();
+                        asyncTaskSyncUndo.execute(inserted_id);
+
+                    }
+                }
+
+            }
+            try
+            {
                 reader.close();
             }
 
@@ -82,6 +106,85 @@ public class HttpUtil {
         }
 
         return response;
+    }
+
+
+    class AsyncTaskSyncUndo extends AsyncTask<String, Void, String> {
+
+        int flag = 0, flag1 = 1;
+
+        public AsyncTaskSyncUndo() {
+            flag = 0;
+            flag1 = 1;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String inserted_id = params[0];
+            String register_url = "http://192.168.43.79:5000/undo/" + inserted_id;
+            //String register_url = "http://indooroutdoor.herokuapp.com/undo/" + inserted_id;
+            Log.d("url1", register_url);
+
+            try {
+                URL url = new URL(register_url);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept-Charset", "UTF-8");
+                conn.setDoInput(true);
+                String line = "nothing";
+                int responseCode = conn.getResponseCode();
+                Log.d("response code:", responseCode + "");
+                if (responseCode == HttpsURLConnection.HTTP_OK) {
+                    Log.d("response code:", responseCode + "");
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    line = sb.toString();
+                }
+                return line;
+            } catch (Exception e) {
+                flag1 = 0;
+                return e.toString();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            if (flag1 != 0) {
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+    }
+
+    JSONObject jsonObject;
+    public String decode_details(String myJSON)
+    {
+        try{
+            try {
+                jsonObject=new JSONObject(myJSON);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String status,inserted_id;
+            inserted_id=jsonObject.getString("inserted_id");
+            status=jsonObject.getString("status");
+            Log.d("inserted_id",inserted_id);
+            Utils.saveDataInPref(context,inserted_id,Utils.LAST_INSERT_ID);
+            return inserted_id;
+        }
+        catch(JSONException e)
+        {
+            e.printStackTrace();
+        }
+        return "";
     }
 
 
