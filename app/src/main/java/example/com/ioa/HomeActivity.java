@@ -106,7 +106,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
         long notificationgap= Long.parseLong(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY))*60*1000;
         alarmManager.setRepeating(AlarmManager.RTC, when,notificationgap, pendingIntent);
-
         Utils.getAllCellInfo(getApplicationContext());
 
     }
@@ -297,7 +296,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=0)
+                    if(time>=10)
                         start_record_send(v);
                 }
                 else
@@ -327,7 +326,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=0)
+                    if(time>=5)
                         start_record_send(v);
                 }
                 else
@@ -355,7 +354,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=0)
+                    if(time>=5)
                         start_record_send(v);
                 }
                 else
@@ -384,7 +383,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=0)
+                    if(time>=5)
                         start_record_send(v);
                 }
                 else
@@ -413,8 +412,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                else
                Toast.makeText(this,"please select any image",Toast.LENGTH_SHORT).show();
 */
-
-
               String device_id=Utils.getDeviceid(getApplicationContext());
                async_obj=new AsyncTaskSync1();
                async_obj.execute(device_id);
@@ -622,6 +619,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 String base64 = Base64.encodeToString(soundBytes, Base64.DEFAULT);
                 Log.d("bytes1",soundBytes.toString()+" "+base64);
 
+                File file=new File(Environment.getExternalStorageDirectory(),temp_path);
+                if(file.exists())
+                {
+                    Log.d("filestatus","deleted");
+                    file.delete();
+                }
                 Utils.saveDataInPref(ctx,base64,Utils.FILE_BASE64_KEY);
                 captureRecord(selectedItem);
 

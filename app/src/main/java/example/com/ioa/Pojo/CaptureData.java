@@ -9,6 +9,7 @@ public class CaptureData {
     String userid;
     String rssrp;
     String rssi;
+    String rsrq;
     String sinr;
     String cellid;
     String chargerConnected;
@@ -28,12 +29,30 @@ public class CaptureData {
     String imei;
     String cqi,ta,asulevel,level;
     ArrayList<WifiData> wifijson;
+    String wifijson_string;
     String sending_timestamp;
     String gpsSatelliteData;
     String audio_file_base64;
     String device_model,android_version;
     String operator_name;
     String airplane_mode;
+
+
+    public String getWifijson_string() {
+        return wifijson_string;
+    }
+
+    public void setWifijson_string(String wifijson_string) {
+        this.wifijson_string = wifijson_string;
+    }
+
+    public String getRsrq() {
+        return rsrq;
+    }
+
+    public void setRsrq(String rsrq) {
+        this.rsrq = rsrq;
+    }
 
     public String getAirplane_mode() {
         return airplane_mode;
