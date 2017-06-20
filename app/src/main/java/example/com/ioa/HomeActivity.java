@@ -159,14 +159,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
-                progress=progress+5;
+                   progress = progress + 5;
+
                 txtv.setText(""+progress+" Min");
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {}
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-                int progress=seekBar.getProgress()+5;
+                int progress;
+
+                    progress=seekBar.getProgress()+5;
+
                 Utils.saveDataInPref(HomeActivity.this,progress+"",Utils.NOTFICATION_TIME_KEY);
                 Toast.makeText(HomeActivity.this,"notification time set to "+  progress+" min",Toast.LENGTH_SHORT).show();
                 txtv.setText(""+progress+" Min");
@@ -226,23 +230,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         {
             case 1:
                 info1.setVisibility(View.VISIBLE);
-                info.setText("Bounded by multiple walls");
-                info1.setText("Away from window ( more than 2 meters)");
-
-
+                info.setText(" >  Bounded by multiple walls");
+                info1.setText(" >  Away from window ( more than 1 meters)");
                 break;
             case 2:
-                info.setText("Indoor but close to window pane (less than 2 meters)");
+                info.setText(" >  Indoor but close to window pane (less than 1 meters)");
                 info1.setVisibility(View.GONE);
                 break;
             case 3:
                 info1.setVisibility(View.VISIBLE);
-                info.setText("Outdoor but close to building");
-                info1.setText("Outdoor but surrounded by buildings");
+                info.setText(" >  Outdoor but very close to building");
+                info1.setText(" >  Outdoor but surrounded by buildings");
                 break;
             case 4:
-                info.setText("On Road or open spaces ");
-                info1.setVisibility(View.GONE);
+                info.setText(" >  On Road ");
+                info1.setText(" >  Open spaces ");
                 break;
         }
 
@@ -286,7 +288,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.img_balcony:
-                selectedItem="Balcony";
+                selectedItem="Just Outdoor";//balcony
                 imgTickBalcony.setVisibility(View.VISIBLE);
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.GONE);
@@ -316,7 +318,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 snackbar.show();
                 break;
             case R.id.img_kitchen:
-                selectedItem="Kitchen";
+                selectedItem="Deep Indoor";//kitchen
                 imgTickBalcony.setVisibility(View.GONE);
                 imgTickOutdoor.setVisibility(View.GONE);
                 imgTickKitchen.setVisibility(View.VISIBLE);
@@ -344,7 +346,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 snackbar.show();
                 break;
             case R.id.img_living:
-                selectedItem="Living";
+                selectedItem="Just indoor";//living
                 imgTickBalcony.setVisibility(View.GONE);
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.VISIBLE);
@@ -373,7 +375,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.img_outdoor:
-                selectedItem="OutDoor";
+                selectedItem="Deep Outdoor";
                 imgTickBalcony.setVisibility(View.GONE);
                 imgTickKitchen.setVisibility(View.GONE);
                 imgTickLiving.setVisibility(View.GONE);

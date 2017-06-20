@@ -27,8 +27,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class HttpUtil {
 
     private AsyncTaskSyncUndo asyncTaskSyncUndo;
-    private static final String POST_URL ="http://192.168.43.79:5000/push" ;
-   // private static final String POST_URL ="http://indooroutdoor.herokuapp.com/push" ;
+    //private static final String POST_URL ="http://192.168.43.79:5000/push" ;
+   private static final String POST_URL ="http://indooroutdoor.herokuapp.com/push" ;
     private static final String SYNC_URL ="http://indooroutdoor.herokuapp.com/stats/" ;
     private Context context;
     private String inserted_id;
@@ -121,8 +121,8 @@ public class HttpUtil {
         @Override
         protected String doInBackground(String... params) {
             String inserted_id = params[0];
-            String register_url = "http://192.168.43.79:5000/undo/" + inserted_id;
-            //String register_url = "http://indooroutdoor.herokuapp.com/undo/" + inserted_id;
+           // String register_url = "http://192.168.43.79:5000/undo/" + inserted_id;
+            String register_url = "http://indooroutdoor.herokuapp.com/undo/" + inserted_id;
             Log.d("url1", register_url);
 
             try {

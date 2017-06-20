@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.GnssStatus;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -15,6 +16,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
 import android.telephony.CellInfo;
@@ -340,7 +342,7 @@ public class Utils{
         captureData.setTemprature(battery_details.get(0));
         captureData.setMobileNumber(Utils.getDataFromSharedPref(context,Utils.PHONE_NUMBER));
         captureData.setImei(getIMEI(context));
-
+        captureData.setAirplane_mode(isAirplaneModeOn(context)+"");
         Gson gson1=new Gson();
         String cData=gson1.toJson(captureData, CaptureData.class);
         Iodata.setJsonData(cData);
@@ -462,16 +464,20 @@ public class Utils{
     {
         LocationManager locationManager = null;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         JSONObject object=new JSONObject();
         JSONArray jsonArray=new JSONArray();
         if(isGPSEnabled(context))
         {
+
             GpsStatus gpsStatus = locationManager.getGpsStatus(null);
             if (gpsStatus != null) {
                 Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
+                Log.d("gpssdata",satellites.toString());
                 Iterator<GpsSatellite> sat = satellites.iterator();
+                Log.d("gpssdata",sat.toString());
+
+                Log.d("gpss",gpsStatus.getMaxSatellites()+"");
                 int i = 0;
                 while (sat.hasNext()) {
                     GpsSatellite satellite = sat.next();
@@ -485,7 +491,11 @@ public class Utils{
                         jsonArray.put(object);
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Log.d("gpss",e.toString());
+
                     }
+                    Log.d("gpss",satellite.getPrn()+"1");
+
                 }
                 Log.d("gpssatellitedata",jsonArray+"");
                 return jsonArray.toString();
@@ -524,5 +534,12 @@ public class Utils{
             Log.d("model1",Character.toUpperCase(first) + s.substring(1));
             return Character.toUpperCase(first) + s.substring(1);
         }
+    }
+
+    public static boolean isAirplaneModeOn(Context context) {
+
+        return Settings.System.getInt(context.getContentResolver(),
+                Settings.System.AIRPLANE_MODE_ON, 0) != 0;
+
     }
 }

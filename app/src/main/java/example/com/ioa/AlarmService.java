@@ -49,8 +49,6 @@ public class AlarmService extends IntentService {
                 new NotificationCompat.Builder(this).setSmallIcon(R.drawable.app_logo).
                         setTicker("Ticker Text").setContent(notificationView) .setAutoCancel(true);
 
-
-
         PendingIntent pendingsettingsIntent =PendingIntent.
                 getBroadcast(getBaseContext(), btnid, settingsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -62,39 +60,31 @@ public class AlarmService extends IntentService {
 
 
     public static class DownloadCancelReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle answerBundle = intent.getExtras();
+            Log.d("buttonclick","1");
             int btnclick = answerBundle.getInt("btnclick");
             int notificationid = answerBundle.getInt("notificationid");
             switch (btnclick){
                 case R.id.btn1:
                     Log.d("buutton click","1");
-                    Utils.performActionOnButtonClick(context,"button1");
+                    Utils.performActionOnButtonClick(context,"Deep Indoor");
                     break;
                 case R.id.btn2:
-                    Utils.performActionOnButtonClick(context,"button2");
+                    Utils.performActionOnButtonClick(context,"Just Indoor");
                     break;
                 case R.id.btn3:
                     Log.d("buutton click","3");
-                    Utils. performActionOnButtonClick(context,"button3");
+                    Utils. performActionOnButtonClick(context,"Just Outdoor");
                     break;
                 case R.id.btn4:
                     Log.d("buutton click","4");
-                    Utils.performActionOnButtonClick(context,"button4");
+                    Utils.performActionOnButtonClick(context,"Deep Outdoor");
                     break;
             }
-
             NotificationManager notificationManager =  (NotificationManager)context. getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(notificationid);
-
-
         }
-
-
     }
-
-
-
 }

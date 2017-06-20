@@ -33,6 +33,15 @@ public class CaptureData {
     String audio_file_base64;
     String device_model,android_version;
     String operator_name;
+    String airplane_mode;
+
+    public String getAirplane_mode() {
+        return airplane_mode;
+    }
+
+    public void setAirplane_mode(String airplane_mode) {
+        this.airplane_mode = airplane_mode;
+    }
 
     public void setAltitude(String altitude) {
         this.altitude = altitude;
