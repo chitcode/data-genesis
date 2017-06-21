@@ -158,8 +158,14 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
-                   progress = progress + 5;
 
+                if(progress==0)
+                {
+                    progress+=1;
+                }
+                else {
+                    progress = progress + 5;
+                }
                 txtv.setText(""+progress+" Min");
             }
 
@@ -168,8 +174,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int progress;
 
-                    progress=seekBar.getProgress()+5;
-
+                if(seekBar.getProgress()==0)
+                {
+                    progress=1;
+                }
+                else {
+                    progress = seekBar.getProgress() + 5;
+                }
                 Utils.saveDataInPref(HomeActivity.this,progress+"",Utils.NOTFICATION_TIME_KEY);
                 Toast.makeText(HomeActivity.this,"notification time set to "+  progress+" min",Toast.LENGTH_SHORT).show();
                 txtv.setText(""+progress+" Min");
