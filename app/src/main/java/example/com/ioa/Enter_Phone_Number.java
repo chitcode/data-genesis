@@ -1,5 +1,7 @@
 package example.com.ioa;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,27 +26,28 @@ public class Enter_Phone_Number extends AppCompatActivity {
         submit=(Button)findViewById(R.id.btn_next);
 
 
-        if(Utils.getPhoneNumber(getApplicationContext()).equals(""))
-        {
-            if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER)==null)
-            {
+        if(Utils.getPhoneNumber(getApplicationContext())==null) {
+                if (Utils.getDataFromSharedPref(getApplicationContext(), Utils.PHONE_NUMBER) == null) {
 
-            }
-            else
-            if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER).equals(null))
-            {
+                } else if (Utils.getDataFromSharedPref(getApplicationContext(), Utils.PHONE_NUMBER).equals(null)) {
 
-            }
-            else
-            {
-                nextPage();
-            }
+                } else {
+                    nextPage();
+                }
         }
-        else{
+        else if(!Utils.getPhoneNumber(getApplicationContext()).equals(""))
+            {
             String phone_number=Utils.getPhoneNumber(getApplicationContext());
                 Toast.makeText(getApplicationContext(),"Number found"+phone_number,Toast.LENGTH_LONG).show();
             Utils.saveDataInPref(getApplicationContext(),phone_number,Utils.PHONE_NUMBER);
             nextPage();
+        }
+        else
+        {
+            if(Utils.getDataFromSharedPref(getApplicationContext(), Utils.PHONE_NUMBER)!=null) {
+                if(!Utils.getDataFromSharedPref(getApplicationContext(), Utils.PHONE_NUMBER).equals(""))
+                nextPage();
+            }
         }
 
         submit.setOnClickListener(new View.OnClickListener() {
@@ -73,8 +76,35 @@ public class Enter_Phone_Number extends AppCompatActivity {
 
     private void nextPage()
     {
-        Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
-        startActivity(intent);
-        finish();
+
+        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.NOTFICATION_TIME_KEY)==null)
+        {
+            Utils.saveDataInPref(getApplicationContext(),"5",Utils.NOTFICATION_TIME_KEY);
+            startAlarm();
+        }
+
+        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.PHONE_NUMBER)!=null) {
+            Log.d("phone_nuber", Utils.getDataFromSharedPref(getApplicationContext(), Utils.PHONE_NUMBER));
+            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
+
+    private void startAlarm() {
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(this.ALARM_SERVICE);
+        long when = System.currentTimeMillis();         // notification time
+        Intent intent = new Intent(this, AlarmService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        Log.d("alarmstart","alarmstart");
+        long notificationgap;
+        if(Utils.getDataFromSharedPref(getApplicationContext(),Utils.NOTFICATION_TIME_KEY)!=null) {
+            notificationgap = Long.parseLong(Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY)) * 60 * 1000;
+            alarmManager.setRepeating(AlarmManager.RTC, when, notificationgap, pendingIntent);
+            Utils.getAllCellInfo(getApplicationContext());
+        }
+
+    }
+
 }
+

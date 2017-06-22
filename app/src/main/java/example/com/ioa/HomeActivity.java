@@ -104,6 +104,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         long when = System.currentTimeMillis();         // notification time
         Intent intent = new Intent(this, AlarmService.class);
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, 0);
+        Log.d("alarmstart","alarmstart");
         long notificationgap= Long.parseLong(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY))*60*1000;
         alarmManager.setRepeating(AlarmManager.RTC, when,notificationgap, pendingIntent);
         Utils.getAllCellInfo(getApplicationContext());
@@ -307,7 +308,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=5)
+                    if(time>=4)
                         start_record_send(v);
                 }
                 else
@@ -337,7 +338,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=5)
+                    if(time>=4)
                         start_record_send(v);
                 }
                 else
@@ -365,7 +366,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=5)
+                    if(time>=4)
                         start_record_send(v);
                 }
                 else
@@ -394,7 +395,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=5)
+                    if(time>=4)
                         start_record_send(v);
                 }
                 else
