@@ -148,7 +148,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         if(TextUtils.isEmpty(Utils.getDataFromSharedPref(this,Utils.NOTFICATION_TIME_KEY)))
         Utils.saveDataInPref(HomeActivity.this,"5",Utils.NOTFICATION_TIME_KEY);//default notification time
         else {
-            mSeekbar.setProgress(Integer.parseInt(Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY)));
+            mSeekbar.setProgress(Integer.parseInt(Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY))-5);
         }
 
         txtv.setText(""+Utils.getDataFromSharedPref(this, Utils.NOTFICATION_TIME_KEY)+" Min");
@@ -159,13 +159,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
 
-                if(progress==0)
+             /*   if(progress==0)
                 {
                     progress+=1;
                 }
-                else {
+                else {*/
                     progress = progress + 5;
-                }
+                //}
                 txtv.setText(""+progress+" Min");
             }
 
@@ -174,13 +174,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int progress;
 
-                if(seekBar.getProgress()==0)
+              /*  if(seekBar.getProgress()==0)
                 {
                     progress=1;
                 }
-                else {
+                else {*/
                     progress = seekBar.getProgress() + 5;
-                }
+                //}
                 Utils.saveDataInPref(HomeActivity.this,progress+"",Utils.NOTFICATION_TIME_KEY);
                 Toast.makeText(HomeActivity.this,"notification time set to "+  progress+" min",Toast.LENGTH_SHORT).show();
                 txtv.setText(""+progress+" Min");
@@ -307,7 +307,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     long time= System.currentTimeMillis();
                     time=(time-Long.parseLong(Utils.getDataFromSharedPref(ctx,Utils.LAST_DATA_SENT_TIMESTAMP)))/1000/60;
                     Log.d("time1",time+"");
-                    if(time>=10)
+                    if(time>=5)
                         start_record_send(v);
                 }
                 else
@@ -441,7 +441,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         long current_timestamp= System.currentTimeMillis();
         Utils.saveDataInPref(ctx,current_timestamp+"",Utils.LAST_DATA_SENT_TIMESTAMP);
         //loading = ProgressDialog.show(ctx, "Status", "Sending Data...",true,false);
-
         countDownTimer.start();
     }
     class AsyncTaskSync1 extends AsyncTask<String, Void, String> {
@@ -537,6 +536,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             temp_path=MediaRecorderReady();
             myRecorder.prepare();
             myRecorder.start();
+          //  Toast.makeText(getApplicationContext(),"startring recording",Toast.LENGTH_LONG).show();
         } catch (IllegalStateException e) {
             // start:it is called before prepare()
             // prepare: it is called after start() or before setOutputFormat()
@@ -556,7 +556,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             myRecorder.release();
             myRecorder  = null;
 
-          //  Toast.makeText(getApplicationContext(), "Stop recording...",
+          //  Toast.makeText(getApplicationContext(),"stoping recording",Toast.LENGTH_LONG).show();
+
+            //  Toast.makeText(getApplicationContext(), "Stop recording...",
             //        Toast.LENGTH_SHORT).show();
         } catch (IllegalStateException e) {
             Log.d("errorstop",e+"");
@@ -613,7 +615,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onTick(long millisUntilFinished) {
             // do when countdown timer is started like show progressbar
-
         }
 
         @Override

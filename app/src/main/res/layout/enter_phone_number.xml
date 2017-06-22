@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:hint="Enter Phone Number"
         android:id="@+id/et_phone_number"
+        android:inputType="number"
         android:layout_marginTop="150dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
@@ -19,6 +20,7 @@
         android:id="@+id/btn_next"
         android:text="SUBMIT"
         android:enabled="true"
+
         android:layout_below="@id/et_phone_number"
         android:layout_centerHorizontal="true"
         android:textColor="#ffffff"
@@ -32,6 +34,7 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:text="+91"
+        android:enabled="false"
         android:layout_alignBaseline="@+id/et_phone_number"
         android:layout_alignBottom="@+id/et_phone_number"
         android:layout_toStartOf="@+id/et_phone_number"

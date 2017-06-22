@@ -32,6 +32,7 @@ import android.telephony.CellSignalStrengthLte;
 import android.telephony.TelephonyManager;
 import android.util.ArraySet;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -68,6 +69,7 @@ public class Utils implements LocationListener{
     public static final String LAST_INSERT_ID = "last_insert_id", UNDO_OPTION = "undo_option";//undo_option=1 if undo pending else uundo_option=0
     public static final String FILE_BASE64_KEY = "file_base64", LAST_DATA_SENT_TIMESTAMP = "last_data_sent_timestamp";
     private static Location location_latlong;
+    private static LocationManager location_manager;
     private static List<ScanResult> scanList;
 
     public static void sendDataToserver(Context context) {
@@ -91,7 +93,7 @@ public class Utils implements LocationListener{
         LocationManager locationManager = null;
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
+        location_manager=locationManager;
         if(location!=null)
            location_latlong=location;
         if (gpsTracker.getIsGPSTrackingEnabled()) {
@@ -102,6 +104,7 @@ public class Utils implements LocationListener{
             gpsdata.setLongitude(stringLongitude);
             Log.d("gpsdata", stringLatitude + " " + stringLongitude);
 
+            Toast.makeText(context,stringLatitude+" "+stringLongitude,Toast.LENGTH_LONG).show();
             String country = gpsTracker.getCountryName(context);
             gpsdata.setCountry(country);
 
@@ -313,7 +316,7 @@ public class Utils implements LocationListener{
         captureData.setRsrq(rsrq);
         captureData.setDevice_model(getDeviceName());
         captureData.setAndroid_version(getAndroidVersion());
-        captureData.setGpsSatelliteData(getGpsSatelliteInfo(context));
+        captureData.setGpsSatelliteData(getGpsSatelliteInfo(context,location_manager));
         captureData.setOperator_name(getOperatorName(context));
         captureData.setAudio_file_base64(Utils.getDataFromSharedPref(context, Utils.FILE_BASE64_KEY));
         if (wifiDataArrayList.size() != 0) {
@@ -468,13 +471,12 @@ public class Utils implements LocationListener{
             }
             satellites++;
         }
-        Log.i("gpss", satellites + " Used In Last Fix ("+satellitesInFix+")");
+        Log.d("gpss", satellites + " Used In Last Fix ("+satellitesInFix+")");
     }
 
-    static String getGpsSatelliteInfo(Context context)
+    static String getGpsSatelliteInfo(Context context,LocationManager locationManager)
     {
-        LocationManager locationManager = null;
-        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+       //locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         JSONObject object=new JSONObject();
         JSONArray jsonArray=new JSONArray();
@@ -505,6 +507,7 @@ public class Utils implements LocationListener{
                     } catch (JSONException e) {
                         e.printStackTrace();
                         Log.d("gpss",e.toString());
+                        Toast.makeText(context,satellite.getPrn()+"prn azimuth "+satellite.getAzimuth(),Toast.LENGTH_LONG).show();
 
                     }
                     Log.d("gpss",satellite.getPrn()+"1");
