@@ -104,7 +104,7 @@ public class Utils implements LocationListener{
             gpsdata.setLongitude(stringLongitude);
             Log.d("gpsdata", stringLatitude + " " + stringLongitude);
 
-            Toast.makeText(context,stringLatitude+" "+stringLongitude,Toast.LENGTH_LONG).show();
+     //       Toast.makeText(context,stringLatitude+" "+stringLongitude,Toast.LENGTH_LONG).show();
             String country = gpsTracker.getCountryName(context);
             gpsdata.setCountry(country);
 
@@ -507,7 +507,7 @@ public class Utils implements LocationListener{
                     } catch (JSONException e) {
                         e.printStackTrace();
                         Log.d("gpss",e.toString());
-                        Toast.makeText(context,satellite.getPrn()+"prn azimuth "+satellite.getAzimuth(),Toast.LENGTH_LONG).show();
+                       // Toast.makeText(context,satellite.getPrn()+"prn azimuth "+satellite.getAzimuth(),Toast.LENGTH_LONG).show();
 
                     }
                     Log.d("gpss",satellite.getPrn()+"1");
